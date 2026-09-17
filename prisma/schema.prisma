@@ -1,0 +1,36 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql" // Aap MongoDB ya MySQL bhi use kar sakte hain
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       String    @id @default(uuid())
+  username String    @unique
+  password String // Future mein NextAuth add karenge tab isko update karenge
+  contents Content[] // Ek user ke paas bahut saara content ho sakta hai
+}
+
+model Content {
+  id        String   @id @default(uuid())
+  title     String
+  link      String? // Optional: Agar koi tweet ya YouTube video ka link save karna ho
+  type      String // Type of content: 'tweet', 'article', 'video', 'note'
+  createdAt DateTime @default(now())
+
+  // Relations
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+  tags   Tag[] // Many-to-many relation: Ek content ke multiple tags ho sakte hain
+}
+
+model Tag {
+  id       String    @id @default(uuid())
+  name     String    @unique
+  contents Content[] // Ek tag multiple contents se juda ho sakta hai
+}
