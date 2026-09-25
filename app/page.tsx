@@ -8,7 +8,7 @@ export default function Home() {
   const [link, setLink] = useState("");
   const [type, setType] = useState("note");
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.SubmitEvent) => {
     e.preventDefault();
     
     // API call to our Next.js backend

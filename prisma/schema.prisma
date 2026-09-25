@@ -5,32 +5,42 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql" // Aap MongoDB ya MySQL bhi use kar sakte hain
-  url      = env("DATABASE_URL")
+  provider  = "postgresql" // Aap MongoDB ya MySQL bhi use kar sakte hain
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
+
+// prisma/schema.prisma
 
 model User {
   id       String    @id @default(uuid())
   username String    @unique
-  password String // Future mein NextAuth add karenge tab isko update karenge
-  contents Content[] // Ek user ke paas bahut saara content ho sakta hai
+  password String
+  contents Content[]
+  link     Link? // User ka unique brain share link
+}
+
+model Link {
+  id     String @id @default(uuid())
+  hash   String @unique
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Content {
   id        String   @id @default(uuid())
   title     String
-  link      String? // Optional: Agar koi tweet ya YouTube video ka link save karna ho
-  type      String // Type of content: 'tweet', 'article', 'video', 'note'
+  link      String?
+  type      String // 'tweet' | 'video' | 'article' | 'note'
   createdAt DateTime @default(now())
 
-  // Relations
   userId String
-  user   User   @relation(fields: [userId], references: [id])
-  tags   Tag[] // Many-to-many relation: Ek content ke multiple tags ho sakte hain
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tags   Tag[]
 }
 
 model Tag {
   id       String    @id @default(uuid())
   name     String    @unique
-  contents Content[] // Ek tag multiple contents se juda ho sakta hai
+  contents Content[]
 }
